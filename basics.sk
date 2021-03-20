@@ -1,0 +1,108 @@
+options:
+  spawnDelay: 3
+
+on join:
+  if player has played before:
+    set join message to "&8[&a+&8] &7%player%"
+  else:
+    add 1 to {joins}
+    set join message to "&8[&b+&8] &7%player% &b(##%{joins}%)"
+
+on quit:
+  set leave message to "&8[&c-&8] &7%player%"
+
+command /gmc [<player>]:
+  permission: sk.gmc
+  trigger:
+    if arg-1 is not set:
+      set executor's gamemode to creative
+    else:
+      if player has permission "sk.gmc.others":
+        set arg-1's gamemode to creative
+
+command /gms [<player>]:
+  permission: sk.gms
+  trigger:
+    if arg-1 is not set:
+      set executor's gamemode to survival
+    else:
+      if player has permission "sk.gms.others":
+        set arg-1's gamemode to survival
+
+command /heal [<player>]:
+  permission: sk.heal
+  trigger:
+    if arg-1 is not set:
+      heal the executor
+    else:
+      if player has permission "sk.heal.others":
+        heal arg-1
+
+command /feed [<player>]:
+  permission: sk.feed
+  trigger:
+    if arg-1 is not set:
+      feed the executor
+    else:
+      if player has permission "sk.feed.others":
+        feed arg-1
+
+command /invsee [<player>]:
+  permission: sk.invsee
+  trigger:
+    if arg-1 is not set:
+      send "&c/invsee [player]" to executor
+    else:
+      open the arg-1's inventory for the player
+
+command /enderchest [<player>]:
+  permission: sk.enderchest
+  aliases: /ec
+  trigger:
+    if arg-1 is not set:
+      open the executor's ender chest to the executor
+    if player has permission "sk.enderchest.others":
+      if arg-1 is set:
+        open the arg-1's ender chest to the executor
+
+command /clearinventory [<player>]:
+  permission: sk.clearinventory
+  aliases: /ci
+  trigger:
+    if arg-1 is not set:
+      clear the executor's inventory
+    else:
+      if player has permission "sk.clearinventory.others":
+        clear arg-1's inventory
+
+command /setspawn:
+  permission: sk.setspawn
+  trigger:
+    set {spawn} to location of player
+    send "&3You set your spawn to &f( %{spawn}% )"
+
+command /spawn:
+  trigger:
+    if {spawn} is not set:
+      send "&cSpawn is not set!"
+      stop
+    set {_loc} to player's location
+
+    loop 3 times:
+      if distance between {_loc} and player > 0.1:
+        message "&cYou moved! Teleportation cancelled."
+        stop
+      
+      else:
+        message "&3Dont move! Teleporting in &b%({@spawnDelay} + 1) - loop-number% &3seconds"
+        wait 1 second
+    
+    if distance between {_loc} and player > 0.1:
+      message "&cYou moved! Teleportation cancelled."
+      stop
+    else:
+      send "&3Teleporting..."
+      teleport player to {spawn}
+
+on respawn:
+  teleport player to {spawn}
